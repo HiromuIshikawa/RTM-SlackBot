@@ -2,7 +2,7 @@
 require 'slack'
 require "open-uri"
 
-Slack.configure {|config| config.token = 'xoxb-33480878065-AVr0LyniFeLefUQgAsXGpqaU'}
+Slack.configure {|config| config.token = TOKEN}
 
 client = Slack.realtime
 
