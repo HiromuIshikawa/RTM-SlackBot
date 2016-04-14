@@ -1,4 +1,4 @@
 .DS_Store
 .bundle/
 vendor/
-config.txt
+RTM/config.txt
