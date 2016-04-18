@@ -14,8 +14,11 @@ Slack.configure {|config| config.token = $token}
 client = Slack.realtime
 
 def get_img(url)
-  uri = URI.parse(url)
-
+  begin
+    uri = URI.parse(url)
+  rescue => ex
+    return nil
+  end
   Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     res = http.get(uri.path,{'Authorization' => "Bearer #{$token}"})
@@ -88,16 +91,20 @@ client.on :file_shared do |data|
   params ={
     :as_user => true,
     :channel => data['file']['channels'][0],
-    :text => "ファイルがシェアされました．JPEG形式のファイルで顔検出が可能です．"
+    :text => "ファイルがシェアされました．JPEG形式のファイルで顔検出が可能です"
   }
   if data['file']['filetype'] == 'jpg'
     img = get_img(data['file']['thumb_480'])
-    res = apipost(img)
-    p res
-    params = generate_postMessage(params, res)
+    if img
+      res = apipost(img)
+      p res
+      params = generate_postMessage(params, res)
+    else
+      params[:text] = "画像を読み込むことができませんでした"
+    end
   end
   p params
-  p Slack.chat_postMessage(params)
+  Slack.chat_postMessage(params)
 
 end
 
